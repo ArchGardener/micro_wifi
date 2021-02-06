@@ -42,3 +42,19 @@ class WifiManager:
         # scan for access points
         for ap in self.wlan.scan():
             print(ap)
+
+    def _read_profiles(self):
+        profiles = {}
+        with open(self._filepath) as f:
+            line = f.readline()
+            if not line:
+                # EOF
+                return profiles
+            ssid, password = line.split(";")
+            profiles[ssid] = password
+        return profiles
+
+    def _write_profiles(self, profiles):
+        with open(self._filepath, "w") as f:
+            for ssid, password in profiles.items():
+                f.write("{};{}\n".format(ssid, password))
