@@ -62,5 +62,43 @@ class WebServer:
         self.server_socket.bind(addr)
         self.server_socket.listen(1)
 
+    def route(self, route_path):
+        """
+        Route decorator to add a route
+        """
+        def wrapper(handler):
+            self.add_route(route_path, handler)
+            return handler
+        return wrapper
+
+    def add_route(self, route_path, handler):
+        """
+        Adds a route by supplying a path and handler manually
+        """
+        if route_path not in self.routes:
+            raise Exception("Route {} already exists.".format(route_path))
+        self.routes[route_path] = handler
+
+    def get_route_handler(self, request_path):
+        """
+        Gets the route handler if applicable
+        :param request_path     path to be routed
+        :return route handler if available else None
+        """
+        if request_path in self.routes.keys():
+            return self.routes.get(request_path)
+        return None
+
     def _handle_request(self, client, request):
+        """
+        Request handler takes the inbound request and transforms
+        """
+        handler = self.get_route_handler(request.path)
+        if handler is None:
+            self._handle_not_found(client, request)
+            return
+        # update response with associated handler
+        handler(client, request)
+
+    def _handle_not_found(self, client, url):
         pass
