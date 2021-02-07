@@ -12,9 +12,15 @@ class WifiManager:
         self.wlan = network.WLAN(network.STA_IF)
         self.ap = network.WLAN(network.AP_IF)
 
+    def is_access_point_mode(self):
+        return self.ap.activate()
+
+    def is_wifi_connected(self):
+        return self.wlan.active()
+
     def auto_connect(self):
         # start by scanning all available access points
-        self._access_point_scan()
+        self.access_point_scan()
 
     def start_ap(self):
         # activate the interface
@@ -37,11 +43,10 @@ class WifiManager:
         print('disconnecting . . .')
         self.wlan.disconnect()
 
-    def _access_point_scan(self):
+    def access_point_scan(self):
         self.start_wlan()
-        # scan for access points
-        for ap in self.wlan.scan():
-            print(ap)
+        # scan and return all available access points
+        return self.wlan.scan()
 
     def _read_profiles(self):
         profiles = {}
