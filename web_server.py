@@ -1,6 +1,5 @@
 import socket
 import network
-import html
 
 
 class WebServerRoute:
@@ -161,11 +160,26 @@ class WebServer:
         for item in request_data[-1].split('&'):
             param = item.split('=', 1)
             if len(param) > 0:
-                res[self._unescape(param[0])] = self._unescape(param[1]) if len(param) > 1 else ''
+                res[self._unescape_plus(param[0])] = self._unescape_plus(param[1]) if len(param) > 1 else ''
         return res
+
+    def _unescape_plus(self, s):
+        return self._unescape(s.replace('+', ' '))
 
     def _unescape(self, s):
         """
         Unescapes any html encoded string
         """
-        return html.unescape(s.replace('+', ' '))
+        if '&' not in s:
+            return s
+        r = str(s).split('%')
+        try:
+            b = r[0].encode()
+            for i in range(1, len(r)):
+                try:
+                    b += bytes([int(r[i][:2], 16)]) + r[i][2:].encode()
+                except Exception:
+                    b += b'%' + r[i].encode()
+            return b.decode('UTF-8')
+        except Exception:
+            return str(s)

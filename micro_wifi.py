@@ -54,12 +54,13 @@ class MicroWifi:
 
         @server.route("/connect", 'POST')
         def connect(client, request):
-            params = wifi_manager.get_form_data(request)
+            params = server.get_form_data(request)
             ssid = params.get('ssid')
             password = params.get('password')
             # try to connect to the network
             status = wifi_manager.connect(ssid, password)
             payload = {
                 'status': status,
-                'msg': 'Successfully connected to {}'.format(ssid) if status else 'Error connecting to {}'.format(ssid)}
-            server.send_response(client, payload, content_type='application/json')
+                'msg': 'Successfully connected to {}'.format(ssid) if status else 'Error connecting to {}'.format(ssid)
+            }
+            server.send_response(client, json.dumps(payload), content_type='application/json')

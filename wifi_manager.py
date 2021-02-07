@@ -39,10 +39,11 @@ class WifiManager:
     def connect(self, essid='', password=''):
         if self.wlan.isconnected():
             self.disconnect()
-        print('connecting . . .')
+        print('connecting to {}'.format(essid))
+        self.start_wlan()
         self.wlan.connect(essid, password)
         if self.wlan.isconnected():
-            print('connected to {}'.format(essid))
+            print('connected')
             self._add_new_profile(essid, password)
             self.stop_ap()
             return True
