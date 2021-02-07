@@ -78,7 +78,7 @@
 
     <div id="networkSelect" class="animate-bottom">
 
-        <form action="/connect">
+        <form action="/connect" method="POST">
             <label for="network">Choose a network:</label>
             <select name="ssid" id="ssid">
                 <option value="todo">todo</option>
@@ -100,13 +100,29 @@
             toggleLoader(true);
             toggleForm(false);
 
-            // todo - ajax request
-            let timeout = setTimeout(showPage, 1000);
-        }
+            var select = document.getElementById('ssid');
 
-        function showPage() {
-            toggleLoader(false);
-            toggleForm(true);
+            // clear any previous options
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+
+            fetch('/scan')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+
+                    data.networks.forEach(element => {
+                        var opt = document.createElement('option');
+                        opt.value = element;
+                        opt.innerHTML = element;
+                        select.appendChild(opt);
+                    });
+
+                    // show page
+                    toggleLoader(false);
+                    toggleForm(true);
+                });
         }
 
         function toggleForm(visible) {
