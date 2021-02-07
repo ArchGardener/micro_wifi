@@ -5,32 +5,36 @@ ACCESS_POINT_NAME = 'MicroWifi'
 ACCESS_POINT_PASSWORD = 'microwifi'
 
 
-def main():
-    web_server = WebServer()
-    wifi_man = WifiManager(ACCESS_POINT_NAME, ACCESS_POINT_PASSWORD)
-    # setup web server routes
-    setup_routes(web_server, wifi_man)
-    # try to auto connect
-    wifi_man.auto_connect()
+class MicroWifi:
+    def __init__(self, ap_name=ACCESS_POINT_NAME, ap_password=ACCESS_POINT_PASSWORD):
+        self.web_server = WebServer()
+        self.wifi_man = WifiManager(ap_name=ap_name,
+                                    ap_password=ap_password)
+        # setup web server routes
+        self.setup_routes(self.web_server, self.wifi_man)
 
-    if wifi_man.is_access_point_mode():
-        # start our web server to allow the user to configure the device
-        web_server.start()
+    def start(self):
+        # try to auto connect
+        self.wifi_man.auto_connect()
+        if self.wifi_man.is_access_point_mode():
+            # start our web server to allow the user to configure the device
+            self.web_server.start()
 
+    def stop(self):
+        pass
 
-def setup_routes(app, wifi_manager):
-
-    @app.route("/")
-    def home(client, request):
-        html = """
-        <html><head><title>MicroWifi</title> <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" href="data:,">
-        <style></style>
-        </head><body>
-        <h1>Micro Wifi</h1> 
-        </body></html>
-        """
-        wifi_manager.send_response(client, html)
+    def setup_routes(self, app, wifi_manager):
+        @app.route("/")
+        def home(client, request):
+            html = """
+            <html><head><title>MicroWifi</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="icon" href="data:,">
+            <style></style>
+            </head><body>
+            <h1>Micro Wifi</h1> 
+            </body></html>
+            """
+            wifi_manager.send_response(client, html)
 
 
 if __name__ == '__main__':
