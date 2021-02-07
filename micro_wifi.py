@@ -2,12 +2,9 @@ import json
 from web_server import WebServer
 from wifi_manager import WifiManager
 
-ACCESS_POINT_NAME = 'MicroWifi'
-ACCESS_POINT_PASSWORD = 'microwifi'
-
 
 class MicroWifi:
-    def __init__(self, ap_name=ACCESS_POINT_NAME, ap_password=ACCESS_POINT_PASSWORD):
+    def __init__(self, ap_name='MicroWifi', ap_password=''):
         self.web_server = WebServer()
         self.wifi_man = WifiManager(ap_name=ap_name,
                                     ap_password=ap_password)

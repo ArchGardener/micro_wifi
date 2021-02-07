@@ -12,7 +12,7 @@ class WifiManager:
         4: "WPA/WPA2-PSK"
     }
 
-    def __init__(self, ap_name='EspAP', ap_password='', filepath='profiles.txt', connection_max_retries=10):
+    def __init__(self, ap_name='', ap_password='', filepath='profiles.txt', connection_max_retries=10):
         self._filepath = filepath
         self._ap_name = ap_name
         self._ap_password = ap_password
@@ -60,8 +60,8 @@ class WifiManager:
         self.stop_wlan()
         # activate the interface
         self.ap.active(True)
-        # configure the params 
-        self.ap.config(essid=self._ap_name)
+        # configure the params
+        self.ap.config(essid=self._ap_name, password=self._ap_password)
 
     def stop_ap(self):
         # deactivate the interface
