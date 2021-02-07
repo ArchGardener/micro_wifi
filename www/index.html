@@ -79,13 +79,13 @@
     <div id="networkSelect" class="animate-bottom">
 
         <form action="/connect" method="POST">
-            <label for="network">Choose a network:</label>
+            <label for="ssid">Choose a network:</label>
             <select name="ssid" id="ssid">
                 <option value="todo">todo</option>
             </select>
             <br><br>
             <label for="password">Password:</label>
-            <input type="text" name="password" id="password">
+            <input type="password" name="password" id="password">
             <br><br>
             <div>
                 <input type="button" value="Refresh" onclick="getNetworks()">
@@ -103,6 +103,7 @@
             var select = document.getElementById('ssid');
 
             // clear any previous options
+            document.getElementById("password").value = '';
             while (select.options.length > 0) {
                 select.remove(0);
             }
