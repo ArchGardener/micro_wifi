@@ -26,7 +26,7 @@ class MicroWifi:
         #     self.web_server.start()
 
     def stop(self):
-        pass
+        self.web_server.stop()
 
     def setup_routes(self, server, wifi_manager):
         @server.route("/")
@@ -40,3 +40,22 @@ class MicroWifi:
             </body></html>
             """
             server.send_response(client, html)
+
+        @server.route("/scan")
+        def scan(client, request):
+            networks = wifi_manager.access_point_scan()
+            print(networks)
+            payload = {'networks': networks}
+            server.send_response(client, payload, content_type='application/json')
+
+        @server.route("/connect", 'POST')
+        def connect(client, request):
+            # todo - get body from request
+            ssid = ''
+            password = ''
+            # try to connect to the network
+            status = wifi_manager.connect(ssid, password)
+            payload = {
+                'status': status,
+                'msg': 'Successfully connected to {}'.format(ssid) if status else 'Error connecting to {}'.format(ssid)}
+            server.send_response(client, payload, content_type='application/json')
