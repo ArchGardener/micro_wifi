@@ -13,7 +13,7 @@ class WifiManager:
         self.ap = network.WLAN(network.AP_IF)
 
     def is_access_point_mode(self):
-        return self.ap.activate()
+        return self.ap.active()
 
     def is_wifi_connected(self):
         return self.wlan.active()
@@ -24,7 +24,7 @@ class WifiManager:
 
     def start_ap(self):
         # activate the interface
-        self.ap.activate(True)
+        self.ap.active(True)
         # configure the params 
         self.ap.config(essid=self._ap_name, max_clients=self._ap_max_clients)
 
