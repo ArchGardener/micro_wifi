@@ -55,14 +55,18 @@ class WifiManager:
 
     def _read_profiles(self):
         profiles = {}
-        with open(self._filepath) as f:
-            line = f.readline()
-            if not line:
-                # EOF
-                return profiles
-            ssid, password = line.split(";")
-            profiles[ssid] = password
-        return profiles
+        try:
+            with open(self._filepath) as f:
+                line = f.readline()
+                if not line:
+                    # EOF
+                    return profiles
+                ssid, password = line.split(";")
+                profiles[ssid] = password
+        except OSError:
+            pass
+        finally:
+            return profiles
 
     def _add_new_profile(self, ssid, password):
         self._profiles = self._read_profiles()
