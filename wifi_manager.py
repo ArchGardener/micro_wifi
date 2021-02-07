@@ -1,5 +1,4 @@
 import network
-import socket
 
 
 class WifiManager:

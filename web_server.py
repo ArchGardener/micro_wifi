@@ -10,9 +10,6 @@ class WebServerRoute:
 
 
 class WebServer:
-    """
-    A basic web server
-    """
     MAX_SOCKET_RECEIVE = 1024
 
     def __init__(self):
@@ -22,7 +19,7 @@ class WebServer:
 
     def start(self, port=80):
         # an AP is required
-        if not self.ap.isconnected():
+        if not self.ap.active():
             raise Exception('Access Point not running')
 
         # cleanup any previously connected sockets
@@ -83,7 +80,7 @@ class WebServer:
         """
         Adds a route by supplying a path, method and handler manually
         """
-        route_id = self._make_route_id(method, path)
+        route_id = self._make_route_id(path, method)
         if route_id in self.routes:
             raise Exception("Route {} already exists.".format(route_id))
         self.routes[route_id] = WebServerRoute(path, method, handler)
@@ -97,7 +94,7 @@ class WebServer:
             return self.routes.get(route_id)
         return None
 
-    def _make_route_id(self, request_method, request_path):
+    def _make_route_id(self, request_path, request_method):
         """
         Creates a route identifier by joining the method to path
         """
@@ -110,6 +107,7 @@ class WebServer:
         # retrieve the request header from the request
         request_header = request.decode().strip().split('\r\n')
         if not request_header:
+            print('Error with request header')
             self._handle_not_found(client, request)
             return
         # split the header to get method/path
@@ -119,10 +117,12 @@ class WebServer:
             self._handle_not_found(client, request)
             return
         # update response with associated handler
-        handler(client, request)
+        handler.func(client, request)
 
     def _handle_not_found(self, client, url):
-        self.send_response(client, "Route not found: {}".format(url), status_code=404)
+        error_msg = "Route not found: {}".format(url)
+        print(error_msg)
+        self.send_response(client, error_msg, status_code=404)
 
     def send_response(self, client, payload, content_type='text/html', status_code=200):
         content_length = len(payload)
@@ -132,9 +132,9 @@ class WebServer:
         client.close()
 
     def send_header(self, client,
-                     content_type='text/html',
-                     status_code=200,
-                     content_length=None):
+                    content_type='text/html',
+                    status_code=200,
+                    content_length=None):
         client.sendall("HTTP/1.0 {} OK\r\n".format(status_code))
         client.sendall("Content-Type: {}\r\n".format(content_type))
         if content_length is not None:

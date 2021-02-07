@@ -14,10 +14,11 @@ class MicroWifi:
         self.setup_routes(self.web_server, self.wifi_man)
 
     def start(self):
+        print('ap starting')
         self.wifi_man.start_ap()
+        print('ws starting')
         # start our web server to allow the user to configure the device
         self.web_server.start()
-
         # # try to auto connect
         # self.wifi_man.auto_connect()
         # if self.wifi_man.is_access_point_mode():
@@ -27,8 +28,8 @@ class MicroWifi:
     def stop(self):
         pass
 
-    def setup_routes(self, app, wifi_manager):
-        @app.route("/")
+    def setup_routes(self, server, wifi_manager):
+        @server.route("/")
         def home(client, request):
             html = """
             <html><head><title>MicroWifi</title> <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,4 +39,4 @@ class MicroWifi:
             <h1>Micro Wifi</h1> 
             </body></html>
             """
-            wifi_manager.send_response(client, html)
+            server.send_response(client, html)
