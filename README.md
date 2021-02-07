@@ -1,5 +1,5 @@
 # MicroWifi
-A simple class to assist in wifi for micropython.
+A simple class to assist in Wi-Fi for micropython.
 
 **Note: some testing required, mileage may vary.**
 
