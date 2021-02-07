@@ -135,7 +135,7 @@ class WifiManager:
 
     def _write_profiles(self, profiles):
         try:
-            print('Writing profiles', profiles)
+            print('Writing profiles')
             with open(self._filepath, "w") as f:
                 for ssid, password in profiles.items():
                     f.write("{};{}\n".format(ssid, password))
