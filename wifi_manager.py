@@ -12,11 +12,10 @@ class WifiManager:
         4: "WPA/WPA2-PSK"
     }
 
-    def __init__(self, ap_name='EspAP', ap_password='', ap_max_clients=10, filepath='', connection_max_retries=10):
+    def __init__(self, ap_name='EspAP', ap_password='', filepath='profiles.txt', connection_max_retries=10):
         self._filepath = filepath
         self._ap_name = ap_name
         self._ap_password = ap_password
-        self._ap_max_clients = ap_max_clients
         self._connection_max_retries = connection_max_retries
         self.wlan = network.WLAN(network.STA_IF)
         self.ap = network.WLAN(network.AP_IF)
@@ -59,7 +58,7 @@ class WifiManager:
         # activate the interface
         self.ap.active(True)
         # configure the params 
-        self.ap.config(essid=self._ap_name, max_clients=self._ap_max_clients)
+        self.ap.config(essid=self._ap_name)
 
     def stop_ap(self):
         # deactivate the interface
@@ -131,9 +130,10 @@ class WifiManager:
 
     def _write_profiles(self, profiles):
         try:
-            print('Writing profiles')
+            print('Writing profiles', profiles)
             with open(self._filepath, "w") as f:
                 for ssid, password in profiles.items():
                     f.write("{};{}\n".format(ssid, password))
+            print('Profile writing completed')
         except Exception as exc:
             print('Error writing profiles {}'.format(exc))
