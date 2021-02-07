@@ -28,6 +28,10 @@ class WifiManager:
         # configure the params 
         self.ap.config(essid=self._ap_name, max_clients=self._ap_max_clients)
 
+    def stop_ap(self):
+        # deactivate the interface
+        self.ap.active(False)
+
     def start_wlan(self):
         # activate the interface
         self.wlan.active(True)
@@ -40,6 +44,7 @@ class WifiManager:
         if self.wlan.isconnected():
             print('connected to {}'.format(essid))
             self._add_new_profile(essid, password)
+            self.stop_ap()
             return True
         print('error connecting to {}'.format(essid))
         return False
