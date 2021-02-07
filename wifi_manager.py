@@ -32,6 +32,7 @@ class WifiManager:
         if not self._profiles:
             print('No stored profiles, exposing AP')
             self.start_ap()
+            return
         connected = False
 
         # start by scanning all available access points
@@ -81,6 +82,7 @@ class WifiManager:
             self.disconnect()
         print('connecting to {} . . .'.format(essid))
         # switch from ap to wlan mode
+        self.stop_ap()
         self.start_wlan()
         self.wlan.connect(essid, password)
         # wait a few seconds to see if the connection was successful
@@ -115,7 +117,7 @@ class WifiManager:
                 if not line:
                     # EOF
                     return profiles
-                ssid, password = line.split(";")
+                ssid, password = line.strip('\n').split(";")
                 profiles[ssid] = password
         except OSError:
             pass
