@@ -57,6 +57,7 @@ class WifiManager:
             self.start_ap()
 
     def start_ap(self):
+        print('Starting AP {}'.format(self._ap_name))
         self.stop_wlan()
         # activate the interface
         self.ap.active(True)
