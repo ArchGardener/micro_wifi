@@ -125,18 +125,21 @@ class WebServer:
         self.send_response(client, error_msg, status_code=404)
 
     def send_response(self, client, payload, content_type='text/html', status_code=200):
-        content_length = len(payload)
-        self.send_header(client, content_type, status_code, content_length)
-        if content_length > 0:
-            client.sendall(payload)
+        try:
+            content_length = len(payload)
+            self.send_header(client, content_type, status_code, content_length)
+            if content_length > 0:
+                client.sendall(payload)
+        except Exception as exc:
+            print('Error sending response {}'.format(exc))
         client.close()
 
-    def send_header(self, client,
-                    content_type='text/html',
-                    status_code=200,
-                    content_length=None):
-        client.sendall("HTTP/1.0 {} OK\r\n".format(status_code))
-        client.sendall("Content-Type: {}\r\n".format(content_type))
-        if content_length is not None:
-            client.sendall("Content-Length: {}\r\n".format(content_length))
-        client.sendall("\r\n")
+    def send_header(self, client, content_type='text/html', status_code=200, content_length=None):
+        try:
+            client.sendall("HTTP/1.0 {} OK\r\n".format(status_code))
+            client.sendall("Content-Type: {}\r\n".format(content_type))
+            if content_length is not None:
+                client.sendall("Content-Length: {}\r\n".format(content_length))
+            client.sendall("\r\n")
+        except Exception as exc:
+            print('Error sending header {}'.format(exc))
