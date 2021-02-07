@@ -122,16 +122,16 @@ class WebServer:
         handler(client, request)
 
     def _handle_not_found(self, client, url):
-        self._send_response(client, "Route not found: {}".format(url), status_code=404)
+        self.send_response(client, "Route not found: {}".format(url), status_code=404)
 
-    def _send_response(self, client, payload, content_type='text/html', status_code=200):
+    def send_response(self, client, payload, content_type='text/html', status_code=200):
         content_length = len(payload)
-        self._send_header(client, content_type, status_code, content_length)
+        self.send_header(client, content_type, status_code, content_length)
         if content_length > 0:
             client.sendall(payload)
         client.close()
 
-    def _send_header(self, client,
+    def send_header(self, client,
                      content_type='text/html',
                      status_code=200,
                      content_length=None):
