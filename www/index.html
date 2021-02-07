@@ -110,12 +110,10 @@
             fetch('/scan')
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
-
                     data.networks.forEach(element => {
                         var opt = document.createElement('option');
-                        opt.value = element;
-                        opt.innerHTML = element;
+                        opt.value = element[0];
+                        opt.innerHTML = element[0];
                         select.appendChild(opt);
                     });
 

@@ -1,5 +1,6 @@
-from wifi_manager import WifiManager
+import json
 from web_server import WebServer
+from wifi_manager import WifiManager
 
 ACCESS_POINT_NAME = 'MicroWifi'
 ACCESS_POINT_PASSWORD = 'microwifi'
@@ -48,15 +49,14 @@ class MicroWifi:
         @server.route("/scan")
         def scan(client, request):
             networks = wifi_manager.access_point_scan()
-            print(networks)
             payload = {'networks': networks}
-            server.send_response(client, payload, content_type='application/json')
+            server.send_response(client, json.dumps(payload), content_type='application/json')
 
         @server.route("/connect", 'POST')
         def connect(client, request):
-            # todo - get body from request
-            ssid = ''
-            password = ''
+            params = wifi_manager.get_form_data(request)
+            ssid = params.get('ssid')
+            password = params.get('password')
             # try to connect to the network
             status = wifi_manager.connect(ssid, password)
             payload = {

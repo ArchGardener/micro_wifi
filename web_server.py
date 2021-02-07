@@ -1,5 +1,6 @@
 import socket
 import network
+import html
 
 
 class WebServerRoute:
@@ -57,7 +58,6 @@ class WebServer:
 
     def stop(self):
         if not self.server_socket:
-            print('Socket not available')
             return
         self.server_socket.close()
         self.server_socket = None
@@ -105,13 +105,13 @@ class WebServer:
         Request handler takes the inbound request and transforms
         """
         # retrieve the request header from the request
-        request_header = request.decode().strip().split('\r\n')
+        request_header = self.get_request_header(request)
         if not request_header:
             print('Error with request header')
             self._handle_not_found(client, request)
             return
         # split the header to get method/path
-        method, path, *_ = request_header[0].split()
+        method, path, *_ = request_header.split()
         handler = self.get_route_handler(path, method)
         if handler is None:
             self._handle_not_found(client, request)
@@ -143,3 +143,29 @@ class WebServer:
             client.sendall("\r\n")
         except Exception as exc:
             print('Error sending header {}'.format(exc))
+
+    def get_request_header(self, request):
+        """
+        Retrieves the header from a request
+        """
+        request_data = request.decode().strip().split('\r\n')
+        if not request_data:
+            return ''
+        return request_data[0]
+
+    def get_form_data(self, request):
+        res = {}
+        request_data = request.decode().strip().split('\r\n')
+        if not request_data:
+            return res
+        for item in request_data[-1].split('&'):
+            param = item.split('=', 1)
+            if len(param) > 0:
+                res[self._unescape(param[0])] = self._unescape(param[1]) if len(param) > 1 else ''
+        return res
+
+    def _unescape(self, s):
+        """
+        Unescapes any html encoded string
+        """
+        return html.unescape(s.replace('+', ' '))
