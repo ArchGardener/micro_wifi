@@ -84,7 +84,7 @@ class WebServer:
         Adds a route by supplying a path, method and handler manually
         """
         route_id = self._make_route_id(method, path)
-        if route_id not in self.routes:
+        if route_id in self.routes:
             raise Exception("Route {} already exists.".format(route_id))
         self.routes[route_id] = WebServerRoute(path, method, handler)
 
