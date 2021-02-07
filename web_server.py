@@ -2,10 +2,18 @@ import socket
 import network
 
 
+class WebServerRoute:
+    def __init__(self, route, method, func):
+        self.route = route
+        self.method = method
+        self.func = func
+
+
 class WebServer:
     """
     A basic web server
     """
+    MAX_SOCKET_RECEIVE = 1024
 
     def __init__(self):
         self.ap = network.WLAN(network.AP_IF)
@@ -36,7 +44,7 @@ class WebServer:
                 request = b""
                 try:
                     while "\r\n\r\n" not in request:
-                        request += client.recv(512)
+                        request += client.recv(self.MAX_SOCKET_RECEIVE)
                 except OSError:
                     pass
 
@@ -62,38 +70,51 @@ class WebServer:
         self.server_socket.bind(addr)
         self.server_socket.listen(1)
 
-    def route(self, route_path):
+    def route(self, path, method='GET'):
         """
         Route decorator to add a route
         """
         def wrapper(handler):
-            self.add_route(route_path, handler)
+            self.add_route(path, method, handler)
             return handler
         return wrapper
 
-    def add_route(self, route_path, handler):
+    def add_route(self, path, method, handler):
         """
-        Adds a route by supplying a path and handler manually
+        Adds a route by supplying a path, method and handler manually
         """
-        if route_path not in self.routes:
-            raise Exception("Route {} already exists.".format(route_path))
-        self.routes[route_path] = handler
+        route_id = self._make_route_id(method, path)
+        if route_id not in self.routes:
+            raise Exception("Route {} already exists.".format(route_id))
+        self.routes[route_id] = WebServerRoute(path, method, handler)
 
-    def get_route_handler(self, request_path):
+    def get_route_handler(self, request_path, request_method):
         """
         Gets the route handler if applicable
-        :param request_path     path to be routed
-        :return route handler if available else None
         """
-        if request_path in self.routes.keys():
-            return self.routes.get(request_path)
+        route_id = self._make_route_id(request_path, request_method)
+        if route_id in self.routes.keys():
+            return self.routes.get(route_id)
         return None
+
+    def _make_route_id(self, request_method, request_path):
+        """
+        Creates a route identifier by joining the method to path
+        """
+        return '{}:{}'.format(request_method, request_path)
 
     def _handle_request(self, client, request):
         """
         Request handler takes the inbound request and transforms
         """
-        handler = self.get_route_handler(request.path)
+        # retrieve the request header from the request
+        request_header = request.decode().strip().split('\r\n')
+        if not request_header:
+            self._handle_not_found(client, request)
+            return
+        # split the header to get method/path
+        method, path, *_ = request_header[0].split()
+        handler = self.get_route_handler(path, method)
         if handler is None:
             self._handle_not_found(client, request)
             return
