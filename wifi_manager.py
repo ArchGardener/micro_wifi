@@ -10,6 +10,7 @@ class WifiManager:
         self._ap_max_clients = ap_max_clients
         self.wlan = network.WLAN(network.STA_IF)
         self.ap = network.WLAN(network.AP_IF)
+        self._profiles = self._read_profiles()
 
     def is_access_point_mode(self):
         return self.ap.active()
@@ -36,7 +37,12 @@ class WifiManager:
             self.disconnect()
         print('connecting . . .')
         self.wlan.connect(essid, password)
-        print('connected!' if self.wlan.isconnected() else 'error connecting')
+        if self.wlan.isconnected():
+            print('connected to {}'.format(essid))
+            self._add_new_profile(essid, password)
+            return True
+        print('error connecting to {}'.format(essid))
+        return False
     
     def disconnect(self):
         print('disconnecting . . .')
@@ -57,6 +63,11 @@ class WifiManager:
             ssid, password = line.split(";")
             profiles[ssid] = password
         return profiles
+
+    def _add_new_profile(self, ssid, password):
+        self._profiles = self._read_profiles()
+        self._profiles[ssid] = password
+        self._write_profiles(self._profiles)
 
     def _write_profiles(self, profiles):
         with open(self._filepath, "w") as f:
