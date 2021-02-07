@@ -31,14 +31,12 @@ class MicroWifi:
     def setup_routes(self, server, wifi_manager):
         @server.route("/")
         def home(client, request):
-            html = """
-            <html><head><title>MicroWifi</title> <meta name="viewport" content="width=device-width, initial-scale=1">
-            <link rel="icon" href="data:,">
-            <style></style>
-            </head><body>
-            <h1>Micro Wifi</h1> 
-            </body></html>
-            """
+            html = ""
+            try:
+                with open('www/index.html') as f:
+                    html = f.read()
+            except OSError:
+                pass
             server.send_response(client, html)
 
         @server.route("/scan")
