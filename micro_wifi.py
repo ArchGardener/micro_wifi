@@ -38,19 +38,25 @@ class MicroWifi:
     def setup_routes(self, server, wifi_manager):
         @server.route("/")
         def home(client, request):
-            html = ""
             try:
-                with open('www/index.html') as f:
-                    html = f.read()
-            except OSError:
-                pass
-            server.send_response(client, html)
+                html = ""
+                try:
+                    with open('www/index.html') as f:
+                        html = f.read()
+                except OSError:
+                    pass
+                server.send_response(client, html)
+            except Exception as exc:
+                print('Error in home route {}'.format(exc))
 
         @server.route("/scan")
         def scan(client, request):
-            networks = wifi_manager.access_point_scan()
-            payload = {'networks': networks}
-            server.send_response(client, json.dumps(payload), content_type='application/json')
+            try:
+                networks = wifi_manager.access_point_scan()
+                payload = {'networks': networks}
+                server.send_response(client, json.dumps(payload), content_type='application/json')
+            except Exception as exc:
+                print('Error in scan route {}'.format(exc))
 
         @server.route("/connect", 'POST')
         def connect(client, request):

@@ -67,7 +67,6 @@ class WifiManager:
 
     def start_wlan(self):
         # activate the interface
-        self.stop_ap()
         self.wlan.active(True)
 
     def stop_wlan(self):
@@ -123,11 +122,18 @@ class WifiManager:
             return profiles
 
     def _add_new_profile(self, ssid, password):
-        self._profiles = self._read_profiles()
-        self._profiles[ssid] = password
-        self._write_profiles(self._profiles)
+        try:
+            self._profiles = self._read_profiles()
+            self._profiles[ssid] = password
+            self._write_profiles(self._profiles)
+        except Exception as exc:
+            print('Error adding new profile {}'.format(exc))
 
     def _write_profiles(self, profiles):
-        with open(self._filepath, "w") as f:
-            for ssid, password in profiles.items():
-                f.write("{};{}\n".format(ssid, password))
+        try:
+            print('Writing profiles')
+            with open(self._filepath, "w") as f:
+                for ssid, password in profiles.items():
+                    f.write("{};{}\n".format(ssid, password))
+        except Exception as exc:
+            print('Error writing profiles {}'.format(exc))
