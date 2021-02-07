@@ -7,3 +7,6 @@ for i in $(find -not -path "./venv/*" -name "*.py" -o -name "*.html"); do # Whit
     echo uploading "$i"  
     ampy put "$i" "$i"
 done
+
+echo rebooting
+ampy reset
