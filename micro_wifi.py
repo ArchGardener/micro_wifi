@@ -14,11 +14,15 @@ class MicroWifi:
         self.setup_routes(self.web_server, self.wifi_man)
 
     def start(self):
-        # try to auto connect
-        self.wifi_man.auto_connect()
-        if self.wifi_man.is_access_point_mode():
-            # start our web server to allow the user to configure the device
-            self.web_server.start()
+        self.wifi_man.start_ap()
+        # start our web server to allow the user to configure the device
+        self.web_server.start()
+
+        # # try to auto connect
+        # self.wifi_man.auto_connect()
+        # if self.wifi_man.is_access_point_mode():
+        #     # start our web server to allow the user to configure the device
+        #     self.web_server.start()
 
     def stop(self):
         pass
@@ -35,7 +39,3 @@ class MicroWifi:
             </body></html>
             """
             wifi_manager.send_response(client, html)
-
-
-if __name__ == '__main__':
-    main()
