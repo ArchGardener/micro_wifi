@@ -18,6 +18,7 @@ class WebServer:
         self.routes = {}
 
     def start(self, port=80):
+        print('web server starting')
         # an AP is required
         if not self.ap.active():
             raise Exception('Access Point not running')
@@ -56,6 +57,7 @@ class WebServer:
                     client.close()
 
     def stop(self):
+        print('web server stopping')
         if not self.server_socket:
             return
         self.server_socket.close()

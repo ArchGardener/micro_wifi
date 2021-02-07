@@ -27,18 +27,20 @@ class WifiManager:
     def is_wifi_connected(self):
         return self.wlan.active()
 
-    def auto_connect(self, include_open):
+    def auto_connect(self, include_open=False):
+        print('Attempting auto connect')
         if not self._profiles:
             print('No stored profiles, exposing AP')
             self.start_ap()
-      
         connected = False
+
         # start by scanning all available access points
+        print('Scanning for networks')
         networks = self.access_point_scan()
         for ssid, bssid, channel, rssi, authmode, hidden in sorted(networks, key=lambda x: x[3], reverse=True):
             ssid = ssid.decode('utf-8')
             encrypted = authmode > 0
-            print("ssid: %s chan: %d rssi: %d authmode: %s" % (ssid, channel, rssi, self.AUTH_MODES.get(authmode, '?')))
+            print("\t Found ssid: %s chan: %d rssi: %d authmode: %s" % (ssid, channel, rssi, self.AUTH_MODES.get(authmode, '?')))
             if not encrypted and include_open:
                 # it's not secured so let's try to connect
                 connected = self.connect(ssid)

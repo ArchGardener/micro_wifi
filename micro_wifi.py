@@ -15,19 +15,11 @@ class MicroWifi:
         self.setup_routes(self.web_server, self.wifi_man)
 
     def start(self):
-        try:
-            print('ap starting')
-            self.wifi_man.start_ap()
-            print('ws starting')
+        # try to auto connect
+        self.wifi_man.auto_connect()
+        if self.wifi_man.is_access_point_mode():
             # start our web server to allow the user to configure the device
             self.web_server.start()
-        except Exception as exc:
-            print('Error running {}'.format(exc))
-        # # try to auto connect
-        # self.wifi_man.auto_connect()
-        # if self.wifi_man.is_access_point_mode():
-        #     # start our web server to allow the user to configure the device
-        #     self.web_server.start()
 
     def stop(self):
         try:
