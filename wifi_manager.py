@@ -4,6 +4,14 @@ import network
 
 class WifiManager:
 
+    AUTH_MODES = {
+        0: "open",
+        1: "WEP", 
+        2: "WPA-PSK", 
+        3: "WPA2-PSK", 
+        4: "WPA/WPA2-PSK"
+    }
+
     def __init__(self, ap_name='EspAP', ap_password='', ap_max_clients=10, filepath='', connection_max_retries=10):
         self._filepath = filepath
         self._ap_name = ap_name
@@ -20,9 +28,31 @@ class WifiManager:
     def is_wifi_connected(self):
         return self.wlan.active()
 
-    def auto_connect(self):
+    def auto_connect(self, include_open):
+        if not self._profiles:
+            print('No stored profiles, exposing AP')
+            self.start_ap()
+      
+        connected = False
         # start by scanning all available access points
-        self.access_point_scan()
+        networks = self.access_point_scan()
+        for ssid, bssid, channel, rssi, authmode, hidden in sorted(networks, key=lambda x: x[3], reverse=True):
+            ssid = ssid.decode('utf-8')
+            encrypted = authmode > 0
+            print("ssid: %s chan: %d rssi: %d authmode: %s" % (ssid, channel, rssi, self.AUTH_MODES.get(authmode, '?')))
+            if not encrypted and include_open:
+                # it's not secured so let's try to connect
+                connected = self.connect(ssid)
+            else:
+                if ssid not in self._profiles:
+                    # we don't have any profiles for this network so skipping
+                    continue
+                connected = self.connect(ssid, self._profiles[ssid])
+            if connected:
+                break
+        if not connected:
+            print('Failed to detect any previous networks, exposing AP')
+            self.start_ap()
 
     def start_ap(self):
         self.stop_wlan()
@@ -41,6 +71,8 @@ class WifiManager:
         self.wlan.active(True)
 
     def stop_wlan(self):
+        if self.wlan.isconnected():
+            self.wlan.disconnect()
         # deactivate the interface
         self.wlan.active(False)
 
