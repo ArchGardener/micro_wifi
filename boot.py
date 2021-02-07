@@ -4,8 +4,8 @@ from micro_wifi import MicroWifi
 
 
 def setup():
-  esp.osdebug(None)
-  gc.collect()
+    esp.osdebug(None)
+    gc.collect()
 
 
 setup()
