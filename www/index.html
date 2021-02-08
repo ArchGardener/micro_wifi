@@ -113,8 +113,8 @@
                 .then(data => {
                     data.networks.forEach(element => {
                         var opt = document.createElement('option');
-                        opt.value = element[0];
-                        opt.innerHTML = element[0];
+                        opt.value = element;
+                        opt.innerHTML = element;
                         select.appendChild(opt);
                     });
 
