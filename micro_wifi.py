@@ -41,8 +41,8 @@ class MicroWifi:
         @server.route("/scan")
         def scan(client, request):
             try:
-                networks = wifi_manager.access_point_scan()
-                payload = {'networks': networks}
+                network_ssids = [network[0] for network in wifi_manager.access_point_scan()]
+                payload = {'networks': network_ssids}
                 server.send_response(client, json.dumps(payload), content_type='application/json')
             except Exception as exc:
                 print('Error in scan route {}'.format(exc))
