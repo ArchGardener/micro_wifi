@@ -83,7 +83,6 @@ class WifiManager:
             self.disconnect()
         print('connecting to {} . . .'.format(essid))
         # switch from ap to wlan mode
-        self.stop_ap()
         self.start_wlan()
         self.wlan.connect(essid, password)
         # wait a few seconds to see if the connection was successful
@@ -109,7 +108,7 @@ class WifiManager:
         self.start_wlan()
         # scan and return all available access points
         return self.wlan.scan()
-
+        
     def _read_profiles(self):
         profiles = {}
         try:
