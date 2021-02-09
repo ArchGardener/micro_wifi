@@ -1,5 +1,6 @@
 import time
 import network
+from machine import Pin, PWM
 
 
 class WifiManager:
@@ -12,7 +13,7 @@ class WifiManager:
         4: "WPA/WPA2-PSK"
     }
 
-    def __init__(self, ap_name='', ap_password='', filepath='profiles.txt', connection_max_retries=10):
+    def __init__(self, ap_name='', ap_password='', filepath='profiles.txt', connection_max_retries=10, led_pin=2):
         self._filepath = filepath
         self._ap_name = ap_name
         self._ap_password = ap_password
@@ -20,6 +21,8 @@ class WifiManager:
         self.wlan = network.WLAN(network.STA_IF)
         self.ap = network.WLAN(network.AP_IF)
         self._profiles = self._read_profiles()
+        self.led = PWM(Pin(led_pin))
+        self._led_off()
 
     def is_access_point_mode(self):
         return self.ap.active()
@@ -28,13 +31,13 @@ class WifiManager:
         return self.wlan.active()
 
     def auto_connect(self, include_open=False):
+        self._led_flash_slow()
         print('Attempting auto connect')
         if not self._profiles:
             print('No stored profiles, exposing AP')
             self.start_ap()
             return
         connected = False
-
         # start by scanning all available access points
         print('Scanning for networks')
         networks = self.access_point_scan()
@@ -57,6 +60,7 @@ class WifiManager:
             self.start_ap()
 
     def start_ap(self):
+        self._led_off()
         print('Starting AP {}'.format(self._ap_name))
         self.stop_wlan()
         # activate the interface
@@ -81,6 +85,7 @@ class WifiManager:
     def connect(self, essid='', password=''):
         if self.wlan.isconnected():
             self.disconnect()
+        self._led_flash_fast()
         print('connecting to {} . . .'.format(essid))
         # switch from ap to wlan mode
         self.start_wlan()
@@ -91,11 +96,15 @@ class WifiManager:
                 break
             time.sleep(0.5)
             print('. . .')
+        # set the led to be on
         if not self.wlan.isconnected():
             print('error connecting to {}'.format(essid))
             # enable ap again
             self.start_ap()
+            # set the led to be dim
+            self._led_off()
             return False
+        self._led_on()
         print('connected')
         self._add_new_profile(essid, password)
         return True
@@ -141,3 +150,19 @@ class WifiManager:
             print('Profile writing completed')
         except Exception as exc:
             print('Error writing profiles {}'.format(exc))
+
+    def _led_off(self):
+        self.led.duty(0)
+        self.led.freq(2000)
+
+    def _led_on(self):
+        self.led.duty(512)
+        self.led.freq(2000)
+
+    def _led_flash_slow(self):
+        self.led.duty(512)
+        self.led.freq(1)
+
+    def _led_flash_fast(self):
+        self.led.duty(512)
+        self.led.freq(5)
